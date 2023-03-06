@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}書籍一覧{% endblock title %}
+{% block h1 %}書籍一覧{% endblock %}
+
+{% block content %}
+    <form method='post' class='form' name="form">{% csrf_token %}
+        <div id="listWithHandle" class="list-group">
+            {% for book in sorted_books_list %}
+            <div class="wrap list-group-item" data-name="{{ book.id }}">
+                <div class="d-flex">
+                    <h2 class="text-success align-self-center aaa">{{ book.title }}</h2>
+                    {% if book.thumbnail %}
+                        <img src="{{ book.thumbnail.url }}" height="200"/>
+                    {% endif %}
+                </div>
+                <h6>カテゴリ：{{ book.category }}</h6>
+            </div>
+            {% endfor %}
+        </div>
+    <input type="hidden" name='submit' value="">
+    <button type="submit" class="btn btn-success mt-4" onclick="return_sort()">決定する</button>
+    </form>
+    {{ object_pk_list|json_script:"object_pk_list" }} <!-- viewsから渡された変数『object_list（左辺）』をscript側でobject_list（右辺）として使用 -->
+    {{ order_list|json_script:"order_list" }} <!-- viewsから渡された変数『order_list（左辺）』をscript側でorder_list（右辺）として使用 -->
+<script src="{% static 'accounts/js/Sortable.min.js' %}"></script>
+<script src="{% static 'accounts/js/jquery-3.6.3.min.js' %}"></script>
+<script src="{% static 'accounts/js/jquery.cookie.1.4.1.min.js' %}"></script>
+<script>
+    var object_pk_list = JSON.parse(document.getElementById('object_pk_list').textContent); //viewsから渡された変数『object_pk_list（右辺）』をobject_pk_list（左辺）として定義（これが表示する対象のリスト）
+    var order_list = JSON.parse(document.getElementById('order_list').textContent); //viewsから渡された変数『order_list（右辺）』をorder_list（左辺）として定義（これが表示する対象のリスト）
+    // console.log(`profileのbookorder：${order_list}`)
+    var page; // ここに表示するデータを代入するための変数
+    var table = []; // viewsから渡された引数が空だった場合に参照するリスト
+    for (i = 0; i < object_pk_list.length; i++) {
+        console.log(object_pk_list[i]);
+        table[i] = object_pk_list[i];
+    }
+    console.log(`デフォルト設定${table}`)
+
+
+    function init() {
+        sort_table = getTable();
+
+
+    }
+
+    function getTable() {
+        page = order_list; //order_list_を一旦『page』に代入
+        var sort_table;
+        console.log(`page:${page}`)
+        if(page.length !== 0) { //並び替えが登録されている場合はその並び順で表示する 
+            console.log("ifに引っかかった。profileのリストを参照")
+            // console.log(`order_list：${order_list}`)
+            sort_table = order_list;
+            // console.log(`sort_table：${sort_table}`)
+        } 
+        else{ // 並び替えが登録されていない場合は、デフォルトの順番で表示する
+            console.log("elseに引っかかった。デフォルト設定を参照")
+            sort_table = table;
+        }
+        console.log(`sort_table:${sort_table}`)
+        return sort_table;
+    }
+
+
+    var return_sort = function(){
+        console.log("return_sort実行")
+        var box = [];
+            $('.wrap').each(function(index, element){
+            box.push($(element).data('name'));
+            });
+        console.log(box)
+        document.form.submit.value = box;
+    }
+
+    $(function(){
+        init();
+        Sortable.create(listWithHandle, {
+        animation: 150,
+        onUpdate: function (e) {
+            var box = [];
+            $('.wrap').each(function(index, element){
+            box.push($(element).data('name'));
+            });
+            order_list = box
+            console.log(order_list);
+            },
+      });
+    });
+</script>
+
+
+    
+{% endblock content %}

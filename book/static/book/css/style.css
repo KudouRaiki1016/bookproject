@@ -1,0 +1,28 @@
+
+/*
+.targetlist {
+    この例の中でユーザーによるテキストの選択を防止する
+    user-select: none;
+} 
+*/
+
+/* #targetlist div {
+    float: left;
+} */
+/* #listWithHandle div {
+    float: left;
+    margin-left: 5px;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #00A5E3;
+    font-size: 24px;
+    text-align: center;
+}
+*/
+#listWithHandle div:hover {
+    cursor: move;
+}
+
+.aaa {
+    width: 85% !important;
+}

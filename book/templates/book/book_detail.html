@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{{ object.title }}{% endblock %}
+{% block h1 %}書籍詳細{% endblock %}
+{% block content %}
+    <div class="card-header">
+        {% if is_user_liked_for_book %}
+        <button type="button" id="ajax-like-for-book" style="border:none;background:none">
+        <!-- すでにイイねしている時はfasクラス -->
+        <i class="fas fa-heart text-danger" id="like-for-book-icon"></i>
+        </button>
+        {% else %}
+        <button type="button" id="ajax-like-for-book" style="border:none;background:none">
+        <!-- イイねしていないときはfarクラス -->
+        <i class="far fa-heart text-danger" id="like-for-book-icon"></i>
+        </button>
+        {% endif %}
+        <!-- イイねの数 -->
+        <span id="like-for-book-count">{{ like_for_book_count }}</span>
+        <span>件のイイね</span>
+    </div>
+    <div class="p-4 m-4 bg-light border border-success rounded">
+        <h2 class="text-success">{{ object.title }}</h2>
+            <p>{{ object.text }}</p>
+            <div class="border p-4 mb-2">
+                {% for review in object.review_set.all %}
+                <div>
+                    <h3 class="h4">{{ review.title }}</h3>
+                    <div class="px-2">
+                        <span>(投稿ユーザー： {{ review.user.username }})</span>
+                        <h6>評価：{{ review.rate }}点</h6>
+                        <p>{{ review.text }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{% url 'list-book' %}" class="btn btn-primary">一覧へ</a>
+            <a href="{% url 'review' object.pk %}" class="btn btn-primary">レビューする</a>
+            <a href="{% url 'update-book' object.pk %}" class="btn btn-primary">編集する</a>
+            <a href="{% url 'delete-book' object.pk %}" class="btn btn-primary">削除する</a>
+            <h6 class="card-title">{{ object.category }}</h6>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.0.0/mdb.min.js"></script>
+    <script type="text/javascript">
+        /* ポストに対するイイね */
+        document.getElementById('ajax-like-for-book').addEventListener('click', e => {
+          e.preventDefault();
+          const url = '{% url "like_for_book" %}';
+            fetch(url, {
+            method: 'POST',
+            body: `book_pk={{book.pk}}`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+          }).then(response => {
+            return response.json();
+          }).then(response => {
+            // イイね数を書き換える
+            const counter = document.getElementById('like-for-book-count')
+            counter.textContent = response.like_for_book_count
+            const icon = document.getElementById('like-for-book-icon')
+            // 作成した場合はハートを塗る
+            if (response.method == 'create') {
+              icon.classList.remove('far')
+              icon.classList.add('fas')
+              icon.id = 'like-for-book-icon'
+            } else {
+              icon.classList.remove('fas')
+              icon.classList.add('far')
+              icon.id = 'like-for-book-icon'
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        });
+      </script>
+{% endblock content %}

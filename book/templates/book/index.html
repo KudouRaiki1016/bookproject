@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}本棚アプリ{% endblock %}
+{% block h1 %}本棚アプリ{% endblock %}
+
+{% block content %}
+<!-- <script src="{% static 'book/js/script.js' %}"></script>
+<button type="button" onclick="hello()">hello関数呼び出し</button> -->
+{% if searchForm %}
+    <form action='{% url "index" %}' method='get'>
+        <div class='form-group'>
+            {{ searchForm }}
+            <input type="submit" class="btn btn-outline-primary" value="OK" />
+            <a href="{% url 'index' %}" class="btn btn-outline-secondary">クリア</a>
+        </div>
+    </form>
+{% endif %}
+<div class="row">
+    <div class="col-9">
+    {% for book in books %}
+    <div class="p-4 m-4 bg-light border border-success rounded">
+        <h2 class="text-success">{{ book.title }}</h2>
+        {% if book.thumbnail %} <!-- shumbnailは存在している場合だけ表示する（このif文を記載しないとshumbnailがない場合エラーになる） -->
+            <img src="{{ book.thumbnail.url }}" class="img-thumbnail" /> 
+        {% endif %}
+        <h6>カテゴリ：{{ book.category }}</h6>
+        <div class="mt-3">
+            <a href="{% url 'detail-book' book.pk %}">詳細</a>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    <div class="col-3">
+        <h2>評価順TOP2</h2>
+        {% for ranking_book in page_obj %}
+        <div class="p-4 m-4 bg-light border border-success rounded">
+            <h3 class="text-success h5">{{ ranking_book.title }}</h3>
+            {% if ranking_book.thumbnail %} <!-- shumbnailは存在している場合だけ表示する（このif文を記載しないとshumbnailがない場合エラーになる） -->
+                <img src="{{ ranking_book.thumbnail.url }}" cl+ass="img-thumbnail" />
+            {% endif %}
+            <h6>評価：{{ ranking_book.avg_rating|floatformat:2 }}点</h6>
+            <a href="{% url 'detail-book' ranking_book.id %}">詳細を見る</a>
+        </div>
+        {% endfor %}
+        {% include 'book/components/pagination.html' %}
+    </div>
+</div>
+{% endblock content %}
