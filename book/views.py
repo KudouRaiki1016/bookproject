@@ -97,10 +97,8 @@ class UpdateBookView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-
         if obj.user != self.request.user:
             raise PermissionDenied
-
         return obj
 
 def index_view(request):
@@ -187,6 +185,7 @@ def savebook_orderchange_view(request):
     # ----------↓並び替え確定のボタンが押されてリクエストが来た時の分岐↓----------
     if (request.method == 'POST'):
         new_order = request.POST['submit'].split(",") # new_orderに並び替えた後のデータをリスト型で保管する
+        print(new_order)
         # print(f"html側から受け取ったもの：{new_order}") # htmlから渡されたものを確認する
         profile1.save_book_id = new_order # プロフィールのsave_book_idに上書き
         profile1.save() # 変更を保存

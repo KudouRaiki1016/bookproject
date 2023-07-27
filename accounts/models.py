@@ -21,3 +21,9 @@ def create_profile(sender, instance, created, **kwargs):
         # -----↑user...Profileで作成したuserフィールド
         # instance...saveしたデータ（新規作成した一人分のUser情報）が代入されてくる
     instance.profile.save()
+
+class Class(models.Model):
+    name = models.CharField("クラス名", max_length=100)
+    members = models.ManyToManyField(User)
+    def __str__(self):
+        return str(self.name)

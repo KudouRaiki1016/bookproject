@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}クラス一覧{% endblock title %}
+{% block h1 %}クラス一覧{% endblock %}
+{% block content %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #28a745;
+        }
+
+        table {
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>クラス名</th>
+                    <th>学生数</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class in object_list %}
+                    <tr>
+                        <td><a href="{% url 'accounts:class-detail' class.pk %}">{{ class.name }}</a></td>
+                        <td>{{ class.members.all|length }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

@@ -51,3 +51,17 @@ class Folder(models.Model):
         size=100,  # Maximum of 100 ids in list(要素数は100個まで？)
         )
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+
+# @receiver(post_delete,sender=Memo)#postがdeleteされたらdelete_mypostが実行される
+# def delete_mypost(sender,instance,**kwargs):
+#     profile1 = Profile.objects.get(pk=instance.user.id)
+#     profile1.mypost1.remove(str(instance.pk))
+#     profile1.save()
+
+
+# @receiver(post_save,sender=Memo)
+# def append_mypost(sender,instance,created,**kwargs):
+#     profile1 = Profile.objects.get(pk=instance.user.id)
+#     if created:
+#         profile1.mypost1.insert(0,str(instance.pk))
+#     profile1.save()

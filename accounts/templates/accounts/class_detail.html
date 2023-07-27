@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ object.name }}のメンバー一覧{% endblock title %}
+{% block h1 %}{{ object.name }}のメンバー一覧{% endblock h1 %}
+{% block content %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #28a745;
+        }
+
+        .card {
+            background-color: #e9f5e9;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+        }
+
+        .card-header {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        .card-body {
+            color: #333333;
+        }
+    </style>
+    <div class="container">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'accounts:add-class-members' object.pk %}" class="btn btn-success">メンバーを追加</a>
+            <a href="{% url 'accounts:delete-class-members' object.pk %}" class="btn btn-danger">メンバーを削除</a>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                {{ object.name }}
+            </div>
+            <div class="card-body">
+                {% for member in object.members.all %}
+                    <p>{{ member.username }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+

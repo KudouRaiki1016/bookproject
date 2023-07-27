@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}メンバー追加{% endblock title %}
+{% block h1 %}メンバー追加{% endblock %}
+{% block content %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            color: #28a745;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+        }
+        .card-header {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        .card-body {
+            color: #333333;
+        }
+    </style>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                {{ class.name }}に参加済みのメンバー一覧
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for user in members_list %}
+                        <div class="form-group">
+                            <label for="member{{ user.id }}">
+                                <input type="checkbox" id="member{{ user.id }}" name="members" value="{{ user.id }}"> {{ user.username }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-danger">メンバーから削除する</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

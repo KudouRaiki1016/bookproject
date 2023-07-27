@@ -9,7 +9,7 @@ from django.http import HttpResponse
 
 from .forms import SignupForm
 
-from .models import Profile
+from .models import Profile, Class
 
 from time import sleep
 
@@ -206,9 +206,6 @@ def bookorder_delete(request, book_id):
         {
             'delete_book': delete_book,
         })
-
-
-
 # from .models import Question # 並び替える対象は『Question』
  
 # question_ids = ['q40', 'q30', 'q20', 'q10'] # この順番に並び替えたい
@@ -216,7 +213,7 @@ def bookorder_delete(request, book_id):
 # question_qs = Question.objects.filter(question_id__inquestion_ids) # Questionモデルから『question_ids』のみのIDを取得
 # ↓ここから並べる↓
 # questions_dict = dict([(question.question_id, question) for question in question_qs])　# [id: そのidのQuestionデータ]という形で辞書に収める
-# sorted_questions = [questions_dict[id] for id in session_question_ids_list] # 
+# sorted_questions = [questions_dict[id] for id in session_question_ids_list]
 
 # import sys
 # sys.path.append('../')
@@ -258,3 +255,67 @@ def bookorder_delete(request, book_id):
 #     request,
 #     'accounts/orderlist.html',
 #     context) 
+
+# クラス一覧表示
+def class_view(request):
+    object_list = Class.objects.all()
+    context = {
+        'object_list': object_list,
+    }
+    return render(request, 'accounts/class_list.html', context)
+
+def class_detail_view(request, class_id):
+    object = Class.objects.get(pk=class_id)
+    context = {
+        'object': object,
+    }
+    return render(request, 'accounts/class_detail.html', context)
+
+def class_member_add_view(request, class_pk):
+    object = Class.objects.get(pk=class_pk)
+    if request.method == 'POST':
+        add_pk_list = request.POST.getlist('members') #リスト型で伝わってくる（中身は文字型）
+        for pk in add_pk_list:
+            object.members.add(User.objects.get(pk=int(pk)))
+        return redirect('accounts:class-detail', class_pk)
+    else:
+        object_list = User.objects.all()
+        # ----------未参加者のリストを作成する----------
+        # -----↓全ユーザーのpkリスト作成↓
+        all_user_pk_list = []
+        for user in object_list:
+            all_user_pk_list.append(user.pk)
+        # -----
+        # -----↓参加済みユーザーのpkリスト作成↓
+        attended_user_pk_list = []
+        for member in object.members.all():
+            attended_user_pk_list.append(member.pk)
+        # -----
+        # 「未参加ユーザー」 = 「全ユーザー」 - 「参加済みユーザー」
+        no_attended_user_pk_list = list(set(all_user_pk_list) - set(attended_user_pk_list))
+        no_attended_user_dic = dict((user_pk, User.objects.get(pk=user_pk)) for user_pk in no_attended_user_pk_list)
+        no_attended_user_list = [no_attended_user_dic[user_pk] for user_pk in no_attended_user_pk_list]
+        # print(all_user_pk_list)
+        # print(attended_user_pk_list)
+        # print(no_attended_user_pk_list)
+        # print(no_attended_user_dic)
+        context = {
+            'class': object,
+            'user_list': no_attended_user_list,
+        }
+        return render(request, 'accounts/class_members_add.html', context)
+
+def class_member_delete_view(request, class_pk):
+    object = Class.objects.get(pk=class_pk)
+    if request.method == 'POST':
+        delete_pk_list = request.POST.getlist('members') #リスト型で伝わってくる（中身は文字型）
+        for pk in delete_pk_list:
+            object.members.remove(User.objects.get(pk=int(pk)))
+        return redirect('accounts:class-detail', class_pk)
+    else:    
+        members_list = object.members.all()
+        context = {
+            'class': object,
+            'members_list': members_list,
+        }
+        return render(request, 'accounts/class_members.delete.html', context)
